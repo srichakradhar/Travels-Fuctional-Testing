@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fresco Travels</title>
+<link rel="icon" type="image/png" href="images/favicon.png"/>
+<style>
+body {
+	background: url("images/bg.jpg") no-repeat center center fixed;
+	background-size: cover;
+	background-color: #cccccc;
+	text-align: center;
+	font-size: 28px;
+}
+.menu {
+	padding-top:30px;
+}
+.menu a {
+	text-decoration:none;
+	background:RGBA(255,255,255,0.5);
+	padding:10px;
+	color:black;
+	width:170px;
+	display:inline-block;
+	font-size:20px;
+	font-weight:800;
+}
+.logo {
+	float:left;
+	width:15%;
+	height:10%;
+}
+.page-content {
+	margin:5% auto;
+	display:none;
+	width:60%;
+	text-align:left;
+}
+#register-form input, #login-form input {
+	width: 100%;
+	padding: 12px 20px;
+  	margin: 8px 0;
+  	display: inline-block;
+  	border: 1px solid #ccc;
+  	border-radius: 4px;
+  	box-sizing: border-box;
+}
+#register-form button, #login-form button {
+	margin:auto;
+	display:block;
+	padding: 10px 20px;
+    background: royalblue;
+    font-weight: 800;
+    font-size: 25px;
+    color: white;
+    text-decoration: none;
+    border: 1px solid mediumblue;
+    border-radius: 5%;
+}
+</style>
+<script>
+function allowDrop(ev) {
+  ev.preventDefault();
+}
+
+function drag(ev) {
+  ev.dataTransfer.setData("text", ev.target.id);
+}
+
+function drop(ev) {
+  ev.preventDefault();
+  var data = ev.dataTransfer.getData("text");
+  ev.target.appendChild(document.getElementById(data));
+  alert("Dropped");
+  var xmlHttp = new XMLHttpRequest();
+	xmlHttp.onreadystatechange = function() {
+		if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+			callback(xmlHttp.responseText);
+	     }
+		xmlHttp.open("GET", "/Drag/", true);
+		xmlHttp.send(null);
+	}
+</script>
+</head>
+<body onload="init()" onresize="resizeHandler()">
+	<div>
+		<img src="images/logo.png" class="logo" id="logo">
+	</div>
+	<div class="menu">
+		<a href="javascript:contentLoader(0)">Data Generator</a>
+		<a href="javascript:contentLoader(1)">Login</a>
+		<a href="javascript:contentLoader(2)">Register</a>
+		<a href="about.html">About</a>
+	</div>
+
+	<iframe src="iframe.html" class="page-content"></iframe>	
+	<div w3-include-html="login.html" class="page-content"></div>
+	<div w3-include-html="register.html" class="page-content"></div>
+	<div w3-include-html="about.html" class="page-content"></div>
+
+	<script src="includer.js"></script>
+	<script>
+		function contentLoader(n) {
+			pageContent = document.getElementsByClassName('page-content');
+			if(n==1){
+				document.getElementById('captcha-image').src = 'images/captcha/' + Math.floor(Math.random() * 10) + '.jpg';
+			}
+			for(i of pageContent)
+			    i.style.display = "none";
+			pageContent[n].style.display = "block";
+		}
+		function loginHandler() {
+			if (document.getElementById('captcha-image').src.replace('http://localhost:8000', '') != "/") {
+				lUsername = document.getElementById('login-username').value;
+				lPassword = document.getElementById('login-password').value;
+				lCaptchaVal = document.getElementById('login-captcha').value + '.jpg';
+				lCaptchaImage = document.getElementById('captcha-image').src.replace('http://localhost:8000/images/captcha/', '');
+				reqString = lUsername + '/' + lPassword + '/' + lCaptchaVal + '/' + lCaptchaImage;
+				var xmlHttp = new XMLHttpRequest();
+				xmlHttp.onreadystatechange = function() {
+					if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+						callback(xmlHttp.responseText);
+				}
+				xmlHttp.open("GET", "/loginData/" + reqString, true);
+				xmlHttp.send(null);
+			}
+			document.getElementById('captcha-image').src = 'images/captcha/' + Math.floor(Math.random() * 10) + '.jpg';
+
+			alert("Login Successfull");
+
+		}
+		function registerHandler() {
+			if (document.getElementById('register-fullname') != null) {
+				rFullName = document.getElementById('register-fullname').value;
+				rUsername = document.getElementById('register-username').value;
+				rPassword = document.getElementById('register-password').value;
+				rMail = document.getElementById('register-mail').value;
+				rMobile = document.getElementById('register-mobile').value;
+				rDob = document.getElementById('register-dob').value.split("-").reverse();
+		        var temp=rDob[0];
+		        rDob[0]=rDob[1];
+		        rDob[1]=temp;
+		        rDob=rDob.join("-");
+				reqString = rFullName + '/' + rUsername + '/' + rPassword + '/' + rMail + '/' + rMobile + '/' + rDob;
+				var xmlHttp = new XMLHttpRequest();
+				xmlHttp.onreadystatechange = function() {
+					if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+						callback(xmlHttp.responseText);
+				}
+				xmlHttp.open("GET", "/regData/" + reqString, true);
+				xmlHttp.send(null);
+			}
+			fieldsArray = [
+				"<input type='text' id='register-fullname' placeholder='Full Name'>",
+				"<input type='text' id='register-username' placeholder='Username'>",
+				"<input type='text' id='register-password' placeholder='Password'>",
+				"<input type='text' id='register-mail' placeholder='Mail'>",
+				"<input type='text' id='register-mobile' placeholder='Mobile'>",
+				"<input type='date' id='register-dob'>",
+				"<button onclick='registerHandler()'>Register</button>"
+			];
+			fieldsArray.sort( () => .3 - Math.random());
+			registerForm = document.getElementById('register-form');
+			registerForm.innerHTML = "";
+			for(i of fieldsArray)
+				registerForm.innerHTML += i;
+			
+		}
+		function resizeHandler(){
+			reqString = window.innerWidth + '/' + window.innerHeight;
+			var xmlHttp = new XMLHttpRequest();
+			xmlHttp.onreadystatechange = function() {
+				if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+					callback(xmlHttp.responseText);
+			}
+			xmlHttp.open("GET", "/resizer/" + reqString, true);
+			xmlHttp.send(null);
+		}
+		function init() {
+			// document.getElementById('captcha-image').src = 'images/captcha/' + Math.floor(Math.random() * 10) + '.jpg';
+
+		}
+
+
+	</script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Data Generator</title>
+<link rel="icon" type="image/png" href="images/favicon.png"/>
+<style>
+label {
+	font-weight:800;
+}
+</style>
+</head>
+<body>
+	<label>Full Name: </label> <span>Random Full Name</span> <br>
+	<label>Username: </label> <span>Random Username</span> <br>
+	<label>Password: </label> <span>Random Password</span> <br>
+	<label>Mail: </label> <span>Random Mail</span> <br>
+	<label>Mobile: </label> <span>Random Mobile</span> <br>
+	<label>DOB: </label> <span>Random DOB</span> <br>
+	<button onclick="changeSpans()">Generate Data</button>
+
+	<script type="text/javascript">
+		function randString(length, flag) {
+			var result = '';
+			var characters = flag ? 'abcdefghijklmnopqrstuvwxyz' : '0123456789' ;
+			var charactersLength = characters.length;
+			for (var i = 0; i < length; i++)
+				result += characters.charAt(Math.floor(Math.random() * charactersLength));
+			return result;
+		}
+		function changeSpans() {
+			spans = document.getElementsByTagName('span');
+			fullname = randString(12, true);
+			username = randString(13, true);
+			password = randString(14, true);
+			mail = randString(15, true) + '@gmail.com';
+			mobile = randString(10, false);
+			dob_d = (Math.floor(Math.random()*29)+1)
+			dob_m = (Math.floor(Math.random()*12)+1)
+			dob_d = dob_d < 10 ? '0' + dob_d : dob_d 
+			dob_m = dob_m < 10 ? '0' + dob_m : dob_m 
+			dob = dob_m +'-'+ dob_d+"-"+(Math.floor(Math.random()*20)+1990);
+			spans[0].innerText = fullname;
+			spans[1].innerText = username;
+			spans[2].innerText = password;
+			spans[3].innerText = mail;
+			spans[4].innerText = mobile;
+			spans[5].innerText = dob
+			var xmlHttp = new XMLHttpRequest();
+			xmlHttp.onreadystatechange = function() {
+				if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+					callback(xmlHttp.responseText);
+			}
+			req_str = fullname+"/"+username+"/"+password+"/"+mail+"/"+mobile+"/"+dob
+			xmlHttp.open("GET", "/randData/" + req_str, true);
+			xmlHttp.send(null);
+		}
+	</script>
+</body>
+</html>
